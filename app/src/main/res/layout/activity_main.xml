@@ -1,11 +1,39 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/helloId"
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <com.wardziniak.swipelist.SwipeLayout
+        android:layout_below="@id/helloId"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        custom:restartOnFinish="false"
+        >
+        <TextView
+            android:id="@+id/swipeLeft"
+            android:background="@drawable/background_front"
+            android:text="Swipe left" android:layout_width="wrap_content"
+            android:gravity="right"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/swipeRight"
+            android:background="@drawable/background_front"
+            android:text="Swipe Right" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/front"
+            android:background="@drawable/background_front"
+            android:text="FRONT" android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </com.wardziniak.swipelist.SwipeLayout>
 
 </RelativeLayout>

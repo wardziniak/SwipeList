@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SwipeLayout">
+        <attr name="restartOnFinish" format="boolean" />
+        <attr name="swipeType" format="enum" >
+            <enum name="left" value="1"/>
+            <enum name="right" value="2"/>
+            <enum name="both" value="3"/>
+            <enum name="none" value="4"/>
+        </attr>
+    </declare-styleable>
+</resources>
