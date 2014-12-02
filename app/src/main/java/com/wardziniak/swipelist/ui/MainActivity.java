@@ -1,17 +1,36 @@
-package com.wardziniak.swipelist;
+package com.wardziniak.swipelist.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.wardziniak.swipelist.R;
+import com.wardziniak.swipelist.AbsSwipeLayout;
+import com.wardziniak.swipelist.SwipeableView;
+
 
 public class MainActivity extends Activity {
+
+    private SwipeableView absSwipeLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        absSwipeLayout = (SwipeableView) findViewById(R.id.swipeLayout);
+        absSwipeLayout.setOnSwipeListener(new AbsSwipeLayout.OnSwipeListener() {
+            @Override
+            public void onLeftSwipe() {
+                Log.d("DUPA", "onLeftSwipe");
+            }
+
+            @Override
+            public void onRightSwipe() {
+                Log.d("DUPA", "onRightSwipe");
+            }
+        });
     }
 
 

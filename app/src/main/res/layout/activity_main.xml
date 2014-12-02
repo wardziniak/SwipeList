@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
@@ -12,11 +13,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.wardziniak.swipelist.SwipeLayout
+    <com.wardziniak.swipelist.SwipeableView
+        android:id="@+id/swipeLayout"
         android:layout_below="@id/helloId"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        custom:restartOnFinish="false"
+        custom:restartOnFinish="true"
+        custom:swipeType="both"
+        custom:swipeRightMargin="50dp"
+        custom:swipeLeftMargin="50dp"
         >
         <TextView
             android:id="@+id/swipeLeft"
@@ -34,6 +39,6 @@
             android:background="@drawable/background_front"
             android:text="FRONT" android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    </com.wardziniak.swipelist.SwipeLayout>
+    </com.wardziniak.swipelist.SwipeableView>
 
 </RelativeLayout>

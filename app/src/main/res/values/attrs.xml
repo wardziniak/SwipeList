@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SwipeLayout">
+    <declare-styleable name="AbsSwipeLayout">
         <attr name="restartOnFinish" format="boolean" />
         <attr name="swipeType" format="enum" >
             <enum name="left" value="1"/>
@@ -8,5 +8,7 @@
             <enum name="both" value="3"/>
             <enum name="none" value="4"/>
         </attr>
+        <attr name="swipeLeftMargin" format="dimension"/>
+        <attr name="swipeRightMargin" format="dimension"/>
     </declare-styleable>
 </resources>
