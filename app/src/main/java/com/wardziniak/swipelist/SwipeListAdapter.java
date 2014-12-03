@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 
 /**
  * Created by wardziniak on 12/2/14.
@@ -11,6 +12,8 @@ import android.widget.BaseAdapter;
 public class SwipeListAdapter extends BaseAdapter {
 
     private Adapter adapter;
+
+    private ListView lv;
 
     public SwipeListAdapter(Adapter adapter) {
         this.adapter = adapter;
