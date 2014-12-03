@@ -108,7 +108,6 @@ public abstract class AbsSwipeLayout extends FrameLayout implements View.OnClick
                         frontViewX = motionEvent.getX();
                         velocityTracker.addMovement(motionEvent);
                         velocityTracker.computeCurrentVelocity(1000);
-                        //Log.d("DUPA", ":" + newXLocation);
                         if (!isRightSwipable && newXLocation > 0) {
                             frontView.setTranslationX(0);
                             break;
@@ -276,11 +275,11 @@ public abstract class AbsSwipeLayout extends FrameLayout implements View.OnClick
     }
 
     public interface ItemOnLeftSwipeListener {
-        public void onLeftSwipe(int position);
+        public void onLeftSwipe(AbsSwipeLayout view, int position);
     }
 
     public interface ItemOnRightSwipeListener {
-        public void onRightSwipe(int position);
+        public void onRightSwipe(AbsSwipeLayout view, int position);
     }
 
     public interface ItemOnSwipeListener extends ItemOnLeftSwipeListener, ItemOnRightSwipeListener {}

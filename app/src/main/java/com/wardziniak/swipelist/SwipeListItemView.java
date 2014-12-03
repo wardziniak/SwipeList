@@ -48,7 +48,7 @@ public class SwipeListItemView extends  AbsSwipeLayout {
             @Override
             public void performeSwipeAction() {
                 if (itemOnLeftSwipeListener != null)
-                    itemOnLeftSwipeListener.onLeftSwipe(position);
+                    itemOnLeftSwipeListener.onLeftSwipe(SwipeListItemView.this, position);
             }
         };
 
@@ -56,7 +56,7 @@ public class SwipeListItemView extends  AbsSwipeLayout {
             @Override
             public void performeSwipeAction() {
                 if (itemOnRightSwipeListener != null)
-                    itemOnRightSwipeListener.onRightSwipe(position);
+                    itemOnRightSwipeListener.onRightSwipe(SwipeListItemView.this, position);
             }
         };
     }

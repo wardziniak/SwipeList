@@ -36,13 +36,14 @@ public class SwipeListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertedView, ViewGroup parent) {
-        AbsSwipeLayout absSwipeLayout = null;
+        SwipeListItemView swipeListItemView = null;
         try {
-            absSwipeLayout = (AbsSwipeLayout) adapter.getView(position, convertedView, parent);
+            swipeListItemView = (SwipeListItemView) adapter.getView(position, convertedView, parent);
+            swipeListItemView.setPosition(position);
         }
         catch (ClassCastException cce) {
             throw new IllegalArgumentException("Wrong View type:" + cce.getMessage());
         }
-        return absSwipeLayout;
+        return swipeListItemView;
     }
 }
