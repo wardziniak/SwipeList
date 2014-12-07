@@ -35,6 +35,16 @@ public class SwipeListAdapter extends BaseAdapter {
     }
 
     @Override
+    public int getViewTypeCount() {
+        return adapter.getViewTypeCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return adapter.getItemViewType(position);
+    }
+
+    @Override
     public View getView(int position, View convertedView, ViewGroup parent) {
         SwipeListItemView swipeListItemView = null;
         try {
