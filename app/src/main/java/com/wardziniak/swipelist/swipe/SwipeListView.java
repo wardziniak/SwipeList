@@ -93,6 +93,14 @@ public class SwipeListView extends ListView {
         swipeListAnimatorSet.cancelItemSwipeListViewAnimations(itemSwipeListView);
     }
 
+    public void finishItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView) {
+        // invoke, when view disappears from window. We should move view till end
+    }
+
+    public boolean containsViewAnimation(ItemSwipeListView itemSwipeListView) {
+        return swipeListAnimatorSet.containsViewAnimation(itemSwipeListView);
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         // Check if swipe mode is enable
@@ -100,9 +108,12 @@ public class SwipeListView extends ListView {
         Log.d("DUPA", "onInterceptTouchEvent:" +":" + ev.getAction() + ":" + touchState);
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                super.onInterceptTouchEvent(ev);
-                swipeListViewTouchListener.onTouch(this, ev);
-                return false;
+                //super.onInterceptTouchEvent(ev);
+                if (swipeListViewTouchListener.onTouchDown(ev))
+                    return true;
+                return super.onInterceptTouchEvent(ev);
+                //return swipeListViewTouchListener.onTouch(this, ev);
+                //return false;
             case MotionEvent.ACTION_MOVE:
                 if (touchState == TOUCH_STATE_SCROLLING_Y)
                     return true;
