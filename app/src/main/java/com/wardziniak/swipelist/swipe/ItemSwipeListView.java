@@ -1,6 +1,7 @@
 package com.wardziniak.swipelist.swipe;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -45,6 +46,15 @@ public class ItemSwipeListView extends FrameLayout {
     public void moveFrontView(float x) {
         frontView.setTranslationX(frontView.getX() + x);
         Log.d("DUPA", "moveFrontView:");
+    }
+
+    public boolean isFrontViewContains(int x, int y) {
+        int [] location = new int[2];
+        frontView.getLocationOnScreen(location);
+        Log.d("DUPA", "isFrontViewContains:::" + x + ":" + y + "::" + location[0] + ":" + location[1] + ":" + (location[0] + frontView.getWidth())
+            + ":" + (location[1] + frontView.getHeight()));
+        Rect rect = new Rect(location[0], location[1], location[0] + frontView.getWidth(), location[1] + frontView.getHeight());
+        return rect.contains(x, y);
     }
 
     public float getFrontViewX() {

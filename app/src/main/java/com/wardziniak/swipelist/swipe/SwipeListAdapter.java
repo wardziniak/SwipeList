@@ -24,11 +24,16 @@ public class SwipeListAdapter extends BaseAdapter {
 
     private Adapter adapter;
     private Context context;
+    private SwipeListView swipeList;
 
     public SwipeListAdapter(Context context, Adapter adapter) {
         super();
         this.adapter = adapter;
         this.context = context;
+    }
+
+    void setSwipeList(SwipeListView swipeList) {
+        this.swipeList = swipeList;
     }
 
     @Override
@@ -57,6 +62,7 @@ public class SwipeListAdapter extends BaseAdapter {
         if (!(view instanceof ItemSwipeListView)) {
             throw new IllegalArgumentException("Incorrect type of View inflate by adapter. Is " + view.getClass() + " instead of ItemSwipeListView.");
         }
+        swipeList.cancelItemSwipeListViewAnimations((ItemSwipeListView) view);
         resetView((ItemSwipeListView) view);
         return view;
     }

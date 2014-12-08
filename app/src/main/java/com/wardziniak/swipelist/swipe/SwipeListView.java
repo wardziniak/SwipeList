@@ -1,11 +1,15 @@
 package com.wardziniak.swipelist.swipe;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import java.util.List;
 
 /**
  * Created by wardziniak on 12/6/14.
@@ -28,6 +32,10 @@ public class SwipeListView extends ListView {
 
     private SwipeListViewTouchListener swipeListViewTouchListener;
 
+    private OnItemLeftSwipeListener onItemLeftSwipeListener;
+    private OnItemRightSwipeListener onItemRightSwipeListener;
+    private SwipeListAnimatorSet swipeListAnimatorSet;
+
 
     ListView listView;
 
@@ -46,11 +54,43 @@ public class SwipeListView extends ListView {
         initAttrs(attrs);
     }
 
+    public void setOnItemLeftSwipeListener(OnItemLeftSwipeListener onItemLeftSwipeListener) {
+        this.onItemLeftSwipeListener = onItemLeftSwipeListener;
+    }
+
+    public void setOnItemRightSwipeListener(OnItemRightSwipeListener onItemRightSwipeListener) {
+        this.onItemRightSwipeListener = onItemRightSwipeListener;
+    }
+
+    public void setOnItemSwipeListener(OnItemSwipeListener onItemSwipeListener) {
+        this.onItemLeftSwipeListener = onItemSwipeListener;
+        this.onItemRightSwipeListener = onItemSwipeListener;
+    }
+
+
     private void initAttrs(AttributeSet attributeSet) {
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
+        swipeListAnimatorSet = new SwipeListAnimatorSet();
         touchSlop = configuration.getScaledTouchSlop();
         swipeListViewTouchListener = new SwipeListViewTouchListener(this, touchSlop);
         setOnTouchListener(swipeListViewTouchListener);
+    }
+
+    public void setAdapter(SwipeListAdapter swipeListAdapter) {
+        super.setAdapter(swipeListAdapter);
+        swipeListAdapter.setSwipeList(this);
+    }
+
+    public void startItemSwipeListViewAnimations(List<ObjectAnimator> objectAnimators) {
+        swipeListAnimatorSet.startAnimations(objectAnimators);
+    }
+
+    public void startItemSwipeListViewAnimations(ObjectAnimator objectAnimator) {
+        swipeListAnimatorSet.startAnimation(objectAnimator);
+    }
+
+    public void cancelItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView) {
+        swipeListAnimatorSet.cancelItemSwipeListViewAnimations(itemSwipeListView);
     }
 
     @Override
@@ -117,6 +157,17 @@ public class SwipeListView extends ListView {
     public void setLastMotionX(float lastMotionX) {
         this.lastMotionX = lastMotionX;
     }
+
+    public interface OnItemLeftSwipeListener {
+        public void onLeftSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id);
+    }
+
+    public interface OnItemRightSwipeListener {
+        public void onRightSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id);
+    }
+
+    public interface OnItemSwipeListener extends OnItemRightSwipeListener, OnItemLeftSwipeListener {}
+
 
 /*    @Override
     public boolean onTouchEvent(MotionEvent ev) {

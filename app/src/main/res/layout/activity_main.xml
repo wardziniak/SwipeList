@@ -41,4 +41,12 @@
             android:layout_height="wrap_content" />
     </com.wardziniak.swipelist.SwipeableView>
 
+    <com.wardziniak.swipelist.swipe.SwipeListView
+        android:layout_below="@+id/swipeLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/swipe_list">
+
+    </com.wardziniak.swipelist.swipe.SwipeListView>
+
 </RelativeLayout>

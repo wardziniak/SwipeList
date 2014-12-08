@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        //if (DEVELOPER_MODE) {
+/*        //if (DEVELOPER_MODE) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
                     .detectDiskWrites()
@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
                     .penaltyLog()
                     .penaltyDeath()
                     .build());
-        //}
+        //}*/
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
