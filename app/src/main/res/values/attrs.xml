@@ -11,15 +11,15 @@
         <attr name="swipeLeftMargin" format="dimension"/>
         <attr name="swipeRightMargin" format="dimension"/>
     </declare-styleable>
-    <declare-styleable name="SwipeableListView">
-        <attr name="restartOnFinish1" format="boolean" />
-        <attr name="swipeType1" format="enum" >
+    <declare-styleable name="SwipeListView">
+        <attr name="SwipeListViewrItemRestartOnFinish" format="boolean" />
+        <attr name="SwipeListViewsItemSwipeType" format="enum" >
             <enum name="left" value="1"/>
             <enum name="right" value="2"/>
             <enum name="both" value="3"/>
             <enum name="none" value="4"/>
         </attr>
-        <attr name="swipeLeftMargin1" format="dimension"/>
-        <attr name="swipeRightMargin1" format="dimension"/>
+        <attr name="SwipeListViewItemLeftMargin" format="dimension"/>
+        <attr name="SwipeListViewItemRightMargin" format="dimension"/>
     </declare-styleable>
 </resources>

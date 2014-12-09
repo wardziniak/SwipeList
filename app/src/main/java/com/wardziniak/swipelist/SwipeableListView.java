@@ -40,13 +40,13 @@ public class SwipeableListView extends ListView {
 
     public void initAttrs(AttributeSet attrs) {
         if (attrs != null) {
-            final TypedArray styled = getContext().obtainStyledAttributes(attrs, R.styleable.SwipeableListView);
+/*            final TypedArray styled = getContext().obtainStyledAttributes(attrs, R.styleable.SwipeableListView);
             this.restartOnFinish = styled.getBoolean(R.styleable.SwipeableListView_restartOnFinish1, true);
             int swipeType = styled.getInt(R.styleable.SwipeableListView_swipeType1, SWIPEABLE_NONE);
             this.isLeftSwipeEnable = (swipeType & SWIPEABLE_LEFT) != 0;
             this.isRightSwipeEnable = (swipeType & SWIPEABLE_RIGHT) != 0;
             this.swipeLeftMargin = styled.getDimension(R.styleable.SwipeableListView_swipeLeftMargin1, 0);
-            this.swipeRightMargin = styled.getDimension(R.styleable.SwipeableListView_swipeRightMargin1, 0);
+            this.swipeRightMargin = styled.getDimension(R.styleable.SwipeableListView_swipeRightMargin1, 0);*/
         }
     }
 

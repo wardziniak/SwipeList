@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.wardziniak.swipelist.R;
 import com.wardziniak.swipelist.AbsSwipeLayout;
@@ -17,7 +18,7 @@ import com.wardziniak.swipelist.swipe.SwipeListAdapter;
 import com.wardziniak.swipelist.swipe.SwipeListView;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SwipeListView.OnItemSwipeListener {
 
     private SwipeableView absSwipeLayout;
 
@@ -49,6 +50,7 @@ public class MainActivity extends Activity {
         //swipeListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemArray));
 
         swipeListView.setAdapter(new SwipeListAdapter(this, new SampleAdapter(this, android.R.layout.simple_list_item_1, itemArray)));
+        swipeListView.setOnItemSwipeListener(this);
 
         absSwipeLayout = (SwipeableView) findViewById(R.id.swipeLayout);
         absSwipeLayout.setOnSwipeListener(new AbsSwipeLayout.OnSwipeListener() {
@@ -85,5 +87,17 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLeftSwipe(SwipeListView swipeListView, int position, long id) {
+        Log.d("DUPA", "onLeftSwipe:" + position);
+        Toast.makeText(this, "onLeftSwipe:" + position, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onRightSwipe(SwipeListView swipeListView, int position, long id) {
+        Log.d("DUPA", "onRightSwipe:" + position);
+        Toast.makeText(this, "onRightSwipe:" + position, Toast.LENGTH_SHORT).show();
     }
 }

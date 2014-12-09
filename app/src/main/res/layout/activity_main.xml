@@ -18,10 +18,10 @@
         android:layout_below="@id/helloId"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        custom:restartOnFinish="true"
+        custom:restartOnFinish="false"
         custom:swipeType="both"
-        custom:swipeRightMargin="50dp"
-        custom:swipeLeftMargin="50dp"
+        custom:swipeRightMargin="100dp"
+        custom:swipeLeftMargin="100dp"
         >
         <TextView
             android:id="@+id/swipeLeft"
@@ -45,6 +45,8 @@
         android:layout_below="@+id/swipeLayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        custom:SwipeListViewItemRightMargin="50dp"
+        custom:SwipeListViewsItemSwipeType="right"
         android:id="@+id/swipe_list">
 
     </com.wardziniak.swipelist.swipe.SwipeListView>

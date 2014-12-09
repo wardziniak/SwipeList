@@ -2,12 +2,14 @@ package com.wardziniak.swipelist.swipe;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import com.wardziniak.swipelist.R;
 
 import java.util.List;
 
@@ -16,10 +18,21 @@ import java.util.List;
  */
 public class SwipeListView extends ListView {
 
+    private static final int SWIPEABLE_LEFT = 1;
+    private static final int SWIPEABLE_RIGHT = 2;
+    private static final int SWIPEABLE_NONE = 0;
+
     public final static int TOUCH_STATE_REST = 0;
     public final static int TOUCH_STATE_SCROLLING_X = 1;
     public final static int TOUCH_STATE_SCROLLING_Y = 2;
     public final static int UNCHOSEN_POSITION = -1;
+
+    private float swipeLeftMargin = 0.0f;
+    private float swipeRightMargin = 0.0f;
+    private boolean isLeftSwipable = true;
+    private boolean isRightSwipable = true;
+    private boolean restartOnFinish = false;
+
 
     private int touchSlop;
 
@@ -35,7 +48,7 @@ public class SwipeListView extends ListView {
     private OnItemLeftSwipeListener onItemLeftSwipeListener;
     private OnItemRightSwipeListener onItemRightSwipeListener;
     private SwipeListAnimatorSet swipeListAnimatorSet;
-
+    private SwipeListAdapter swipeListAdapter;
 
     ListView listView;
 
@@ -69,8 +82,18 @@ public class SwipeListView extends ListView {
 
 
     private void initAttrs(AttributeSet attributeSet) {
+        if (attributeSet != null) {
+            TypedArray styled = getContext().obtainStyledAttributes(attributeSet, R.styleable.SwipeListView);
+            this.restartOnFinish = styled.getBoolean(R.styleable.SwipeListView_SwipeListViewrItemRestartOnFinish, false);
+            final int swipeType = styled.getInt(R.styleable.SwipeListView_SwipeListViewsItemSwipeType, SWIPEABLE_NONE);
+            this.isLeftSwipable = (swipeType & SWIPEABLE_LEFT) != 0;
+            this.isRightSwipable = (swipeType & SWIPEABLE_RIGHT) != 0;
+            this.swipeLeftMargin = styled.getDimension(R.styleable.SwipeListView_SwipeListViewItemLeftMargin, 0.0f);
+            this.swipeRightMargin = styled.getDimension(R.styleable.SwipeListView_SwipeListViewItemRightMargin, 0.0f);
+
+        }
         final ViewConfiguration configuration = ViewConfiguration.get(getContext());
-        swipeListAnimatorSet = new SwipeListAnimatorSet();
+        swipeListAnimatorSet = new SwipeListAnimatorSet(this);
         touchSlop = configuration.getScaledTouchSlop();
         swipeListViewTouchListener = new SwipeListViewTouchListener(this, touchSlop);
         setOnTouchListener(swipeListViewTouchListener);
@@ -79,14 +102,52 @@ public class SwipeListView extends ListView {
     public void setAdapter(SwipeListAdapter swipeListAdapter) {
         super.setAdapter(swipeListAdapter);
         swipeListAdapter.setSwipeList(this);
+        this.swipeListAdapter = (SwipeListAdapter) swipeListAdapter;
     }
 
-    public void startItemSwipeListViewAnimations(List<ObjectAnimator> objectAnimators) {
-        swipeListAnimatorSet.startAnimations(objectAnimators);
+    void onLeftSwipe(int position) {
+        swipeListAdapter.setViewState(position, AnimationType.LEFT);
+        if (onItemLeftSwipeListener != null)
+            onItemLeftSwipeListener.onLeftSwipe(this, position, swipeListAdapter.getItemId(position));
     }
 
-    public void startItemSwipeListViewAnimations(ObjectAnimator objectAnimator) {
-        swipeListAnimatorSet.startAnimation(objectAnimator);
+    void onRightSwipe(int position) {
+        swipeListAdapter.setViewState(position, AnimationType.RIGHT);
+        if (onItemRightSwipeListener != null)
+            onItemRightSwipeListener.onRightSwipe(this, position, swipeListAdapter.getItemId(position));
+    }
+
+    void onFrontBack(int position) {
+        swipeListAdapter.setViewState(position, AnimationType.FRONT);
+    }
+
+//    public void startItemSwipeListViewAnimations(List<ObjectAnimator> objectAnimators) {
+//        swipeListAnimatorSet.startAnimations(objectAnimators);
+//    }
+
+//    public void startItemSwipeListViewAnimations(ObjectAnimator objectAnimator, int motionPosition) {
+//        swipeListAnimatorSet.startAnimation(objectAnimator, motionPosition);
+//    }
+
+    public void startItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView, AnimationType animationType, int motionPosition) {
+        List<ObjectAnimator> objectAnimators = itemSwipeListView.createSwipeAnimation(animationType);
+        swipeListAnimatorSet.startAnimations(objectAnimators, motionPosition, animationType);
+    }
+
+    public void startItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView, float x, int motionPosition) {
+        // We have to start animation and mark entry at position motionPosition as swiped i proper site
+        x = x > 0 ? x - swipeRightMargin : x + swipeLeftMargin;
+        AnimationType animationType = x == 0 ? AnimationType.FRONT : x > 0 ? AnimationType.RIGHT : AnimationType.LEFT;
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(itemSwipeListView.getFrontView(), "x", x);
+        objectAnimator.setDuration(1000);
+        swipeListAnimatorSet.startAnimation(objectAnimator, motionPosition, animationType);
+    }
+
+    public void setItemSwipeListViewAttributes(ItemSwipeListView itemSwipeListView) {
+        itemSwipeListView.setRightSwipeable(isRightSwipable);
+        itemSwipeListView.setLeftSwipeable(isLeftSwipable);
+        itemSwipeListView.setSwipeLeftMargin(swipeLeftMargin);
+        itemSwipeListView.setSwipeRightMargin(swipeRightMargin);
     }
 
     public void cancelItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView) {
@@ -108,7 +169,11 @@ public class SwipeListView extends ListView {
         Log.d("DUPA", "onInterceptTouchEvent:" +":" + ev.getAction() + ":" + touchState);
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                //super.onInterceptTouchEvent(ev);
+                /* ACTION_DOWN is passed directly to swipeListViewTouchListener.
+                    It cannot be handle by SwipeListViewTouchListener::onTouch(..)
+                    because it is not possible to check why it was passed to it.
+                    More detail SwipeListViewTouchListener::onTouch(..)
+                */
                 if (swipeListViewTouchListener.onTouchDown(ev))
                     return true;
                 return super.onInterceptTouchEvent(ev);
@@ -153,37 +218,14 @@ public class SwipeListView extends ListView {
         }
     }
 
-    public int getTouchState() {
-        return touchState;
-    }
-
-    public int getMotionPosition() {
-        return mMotionPosition;
-    }
-
-    public float getLastMotionX() {
-        return lastMotionX;
-    }
-
-    public void setLastMotionX(float lastMotionX) {
-        this.lastMotionX = lastMotionX;
-    }
-
     public interface OnItemLeftSwipeListener {
-        public void onLeftSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id);
+        public void onLeftSwipe(SwipeListView swipeListView,  int position, long id);
     }
 
     public interface OnItemRightSwipeListener {
-        public void onRightSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id);
+        public void onRightSwipe(SwipeListView swipeListView, int position, long id);
     }
 
     public interface OnItemSwipeListener extends OnItemRightSwipeListener, OnItemLeftSwipeListener {}
 
-
-/*    @Override
-    public boolean onTouchEvent(MotionEvent ev) {
-        boolean b = super.onTouchEvent(ev);
-        Log.d("DUPA", "SwipeListView:onTouchEvent:" + b + ":" + ev.getAction());
-        return b;
-    }*/
 }

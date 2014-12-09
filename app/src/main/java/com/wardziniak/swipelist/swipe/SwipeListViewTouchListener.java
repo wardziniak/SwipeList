@@ -71,19 +71,12 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         // Check touch action and decide, what to do
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                // Do not handle ACTION_DOWN. Event was passed through onTouchDown(...)
+                /* Do not handle ACTION_DOWN. Event was passed through onTouchDown(...)
+                    It is not handle here, because sometimes it can be invoked even if SwipeListViewTouchListener don't needed -
+                    None of SwipeListView handle it. In that situation (e.x. Y Scrolling) default ListView::onTouchEvent(...) should handle it
+                 */
+
                 return false;
-/*                motionX = x;//(int) motionEvent.getX();
-                motionY = y;//(int) motionEvent.getY();
-                touchState = TOUCH_STATE_NONE;
-                initVelocityTrackerIfNotExists();
-                velocityTracker.addMovement(motionEvent);
-                velocityTracker.computeCurrentVelocity(1000);
-                checkMotionEventLocation(motionEvent);
-                // we cancel only if touch is on frontView
-                if (isOnFrontView)
-                    return cancelAllItemAnimations(swipeView);
-                return false;*/
             case MotionEvent.ACTION_MOVE:
                 if (getMotion(motionEvent) != TOUCH_STATE_SCROLLING_X || !isOnFrontView)
                     return false;
@@ -126,10 +119,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         int diffX = (int) Math.abs(motionEvent.getRawX() - motionX);
         int diffY = (int) Math.abs(motionEvent.getRawY() - motionY);
         touchState = diffY > touchSlop ? TOUCH_STATE_SCROLLING_Y : diffX > touchSlop ? TOUCH_STATE_SCROLLING_X : touchState;
-//        if (touchState == TOUCH_STATE_SCROLLING_X) {
-//            motionPosition = swipeListView.pointToPosition(motionX, motionY);
-//            swipeView = (ItemSwipeListView) swipeListView.getChildAt(swipeListView.getMotionPosition() - swipeListView.getFirstVisiblePosition());
-//        }
         return touchState;
     }
 
@@ -145,29 +134,33 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         //final float velocityX = velocityTracker.getXVelocity();
         Log.d("DUPA", "makeSwipe:" + velocityX + ":::" + swipeView.getX() + ":" + swipeView.getFrontViewX());
         float x;
+        AnimationType animationType;
         if (Math.abs(velocityX) < MIN_VELOCITY_TO_SWIPE) {
             // Make back animation
             x = 0.0f;
+            animationType = AnimationType.FRONT;
         }
         else if (Math.signum(velocityX) != Math.signum(swipeView.getFrontViewX())) {
-            // swipe ends in other direction than view x
+            // swipe ends with other direction than view x
             x = 0.0f;
+            animationType = AnimationType.FRONT;
         }
         else {
             // Perform swipe animation
             x = swipeView.getFrontViewX() > 0.0f ? swipeView.getWidth() : -swipeView.getWidth();
+            animationType = swipeView.getFrontViewX() > 0.0f ? AnimationType.RIGHT : AnimationType.LEFT;
         }
-        startAnimation(x);
+
+        animationType = Math.abs(velocityX) < MIN_VELOCITY_TO_SWIPE || Math.signum(velocityX) != Math.signum(swipeView.getFrontViewX()) ?
+                AnimationType.FRONT : swipeView.getAnimationTypeAccordingToX();
+        swipeListView.startItemSwipeListViewAnimations(swipeView, animationType, motionPosition);
+
+        //startAnimation(x);
     }
 
     private void startAnimation(float x) {
         Log.d("DUPA", "performAnimation:" + x);
-        currentAnimation = new AnimatorSet();
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(swipeView.getFrontView(), "translationX", x);
-        objectAnimator.setDuration(1000);
-        swipeListView.startItemSwipeListViewAnimations(objectAnimator);
-        //currentAnimation.playTogether(objectAnimator);
-        //currentAnimation.start();
+        swipeListView.startItemSwipeListViewAnimations(swipeView, x, motionPosition);
     }
 
     private void initVelocityTrackerIfNotExists() {
