@@ -6,16 +6,16 @@ package com.wardziniak.swipelist.swipe;
 public enum AnimationType {
     LEFT, FRONT, RIGHT;
 
-    public void onAnimationEnd(SwipeListView swipeListView, int position) {
+    public void onAnimationEnd(SwipeListView swipeListView, int position, ItemSwipeListView itemSwipeListView) {
         switch (this) {
             case FRONT:
-                swipeListView.onFrontBack(position);
+                swipeListView.onFrontBack(position, itemSwipeListView);
                 break;
             case RIGHT:
-                swipeListView.onRightSwipe(position);
+                swipeListView.onRightSwipe(position, itemSwipeListView);
                 break;
             case LEFT:
-                swipeListView.onLeftSwipe(position);
+                swipeListView.onLeftSwipe(position, itemSwipeListView);
         }
     }
 }

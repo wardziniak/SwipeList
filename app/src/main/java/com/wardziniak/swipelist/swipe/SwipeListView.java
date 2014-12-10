@@ -105,20 +105,24 @@ public class SwipeListView extends ListView {
         this.swipeListAdapter = (SwipeListAdapter) swipeListAdapter;
     }
 
-    void onLeftSwipe(int position) {
-        swipeListAdapter.setViewState(position, AnimationType.LEFT);
+    void onLeftSwipe(int position, ItemSwipeListView itemSwipeListView) {
+        //swipeListAdapter.setViewState(position, AnimationType.LEFT);
+        //itemSwipeListView.onAnimationFinished();
         if (onItemLeftSwipeListener != null)
             onItemLeftSwipeListener.onLeftSwipe(this, position, swipeListAdapter.getItemId(position));
+        itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.LEFT);
     }
 
-    void onRightSwipe(int position) {
-        swipeListAdapter.setViewState(position, AnimationType.RIGHT);
+    void onRightSwipe(int position, ItemSwipeListView itemSwipeListView) {
+        //swipeListAdapter.setViewState(position, AnimationType.RIGHT);
         if (onItemRightSwipeListener != null)
             onItemRightSwipeListener.onRightSwipe(this, position, swipeListAdapter.getItemId(position));
+        itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.RIGHT);
     }
 
-    void onFrontBack(int position) {
-        swipeListAdapter.setViewState(position, AnimationType.FRONT);
+    void onFrontBack(int position, ItemSwipeListView itemSwipeListView) {
+        //swipeListAdapter.setViewState(position, AnimationType.FRONT);
+        itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.FRONT);
     }
 
 //    public void startItemSwipeListViewAnimations(List<ObjectAnimator> objectAnimators) {
@@ -130,7 +134,7 @@ public class SwipeListView extends ListView {
 //    }
 
     public void startItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView, AnimationType animationType, int motionPosition) {
-        List<ObjectAnimator> objectAnimators = itemSwipeListView.createSwipeAnimation(animationType);
+        List<ObjectAnimator> objectAnimators = itemSwipeListView.createSwipeAnimation(motionPosition, animationType);
         swipeListAnimatorSet.startAnimations(objectAnimators, motionPosition, animationType);
     }
 
@@ -148,6 +152,7 @@ public class SwipeListView extends ListView {
         itemSwipeListView.setLeftSwipeable(isLeftSwipable);
         itemSwipeListView.setSwipeLeftMargin(swipeLeftMargin);
         itemSwipeListView.setSwipeRightMargin(swipeRightMargin);
+        itemSwipeListView.setRestartOnFinish(restartOnFinish);
     }
 
     public void cancelItemSwipeListViewAnimations(ItemSwipeListView itemSwipeListView) {

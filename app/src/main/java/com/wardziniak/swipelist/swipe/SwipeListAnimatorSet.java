@@ -33,7 +33,7 @@ public class SwipeListAnimatorSet implements Animator.AnimatorListener {
         List<Animator> animators = new ArrayList<Animator>();
         for (ObjectAnimator objectAnimator: objectAnimators) {
             objectAnimator.addListener(this);
-            objectAnimator.addListener(new Animator.AnimatorListener() {
+/*            objectAnimator.addListener(new Animator.AnimatorListener() {
 
                 private boolean canceled = false;
 
@@ -44,8 +44,11 @@ public class SwipeListAnimatorSet implements Animator.AnimatorListener {
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    if (!canceled)
-                        animationType.onAnimationEnd(swipeListView, position);
+                    if (!canceled) {
+                        ((View) ((ObjectAnimator) animation).getTarget()).getParent();
+                        animationType.onAnimationEnd(swipeListView, position,
+                                (ItemSwipeListView) ((View) ((ObjectAnimator) animation).getTarget()).getParent());
+                    }
                 }
 
                 @Override
@@ -57,7 +60,7 @@ public class SwipeListAnimatorSet implements Animator.AnimatorListener {
                 public void onAnimationRepeat(Animator animation) {
 
                 }
-            });
+            });*/
             animators.add(objectAnimator);
         }
         final AnimatorSet animatorSet = new AnimatorSet();

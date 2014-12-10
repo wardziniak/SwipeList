@@ -46,7 +46,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         custom:SwipeListViewItemRightMargin="50dp"
-        custom:SwipeListViewsItemSwipeType="right"
+        custom:SwipeListViewrItemRestartOnFinish="false"
+        custom:SwipeListViewsItemSwipeType="both"
         android:id="@+id/swipe_list">
 
     </com.wardziniak.swipelist.swipe.SwipeListView>

@@ -50,7 +50,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         velocityTracker.addMovement(motionEvent);
         velocityTracker.computeCurrentVelocity(1000);
         checkMotionEventLocation(motionEvent);
-        // we cancel only if touch is on frontView
         if (isOnFrontView && containsViewAnimation(swipeView)) {
             // If touch view was animated than we cancel animation and set that we in X scrolling mode
             cancelAllItemAnimations(swipeView);
@@ -83,7 +82,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                 //Log.d("DUPA", "SwipeListViewTouchListener:onTouch:swipeView" + swipeView.getX());
                 velocityTracker.addMovement(motionEvent);
                 velocityTracker.computeCurrentVelocity(1000);
-                swipeView.moveFrontView(x - motionX);
+                swipeView.moveView(x - motionX);
                 motionX = x;//(int) motionEvent.getX();
                 motionY = y;//(int) motionEvent.getY();
                 return true;

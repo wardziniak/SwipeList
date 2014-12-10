@@ -1,5 +1,6 @@
 package com.wardziniak.swipelist.swipe;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Rect;
@@ -27,6 +28,7 @@ public class ItemSwipeListView extends FrameLayout {
     private float swipeRightMargin = 100.0f;
     private boolean isLeftSwipeable;
     private boolean isRightSwipeable;
+    private boolean restartOnFinish;
 
 
     public ItemSwipeListView(Context context) {
@@ -49,8 +51,8 @@ public class ItemSwipeListView extends FrameLayout {
 
     private void onFinishInflateInit() {
         frontView = findViewById(R.id.frontView);
-        swipeRightView = findViewById(R.id.swipeRight);
-        swipeLeftView = findViewById(R.id.swipeLeft);
+        swipeRightView = findViewById(R.id.swipeRightView);
+        swipeLeftView = findViewById(R.id.swipeLeftView);
     }
 
     void setSwipeLeftMargin(float swipeLeftMargin) {
@@ -69,7 +71,18 @@ public class ItemSwipeListView extends FrameLayout {
         this.isRightSwipeable = isRightSwipeable;
     }
 
-    public void moveFrontView(float x) {
+    void setRestartOnFinish(boolean restartOnFinish) {
+        this.restartOnFinish = restartOnFinish;
+    }
+
+    public void checkView() {
+        if (isLeftSwipeable && swipeLeftView == null)
+            throw new IllegalArgumentException("ItemSwipeListView doesn't have child with swipeLeftView id");
+        if (isRightSwipeable && swipeRightView == null)
+            throw new IllegalArgumentException("ItemSwipeListView doesn't have child with swipeRightView id");
+    }
+
+    public void moveView(float x) {
         float newLocation = frontView.getX() + x;
         if (newLocation >= 0 && isRightSwipeable) {
             newLocation = newLocation > frontView.getWidth()- swipeRightMargin ? frontView.getWidth() - swipeRightMargin : newLocation;
@@ -80,6 +93,10 @@ public class ItemSwipeListView extends FrameLayout {
         else
             newLocation = 0.0f;
         frontView.setTranslationX(newLocation);
+        //if (newLocation <= 0) {
+            if (swipeRightView != null)
+                swipeRightView.setTranslationX(newLocation < 0 ? newLocation : 0);
+        //}
         Log.d("DUPA", "moveFrontView:");
     }
 
@@ -87,7 +104,16 @@ public class ItemSwipeListView extends FrameLayout {
         return frontView.getX() > 0 ? AnimationType.RIGHT : AnimationType.LEFT;
     }
 
-    public List<ObjectAnimator> createSwipeAnimation(AnimationType animationType) {
+    public void onAnimationFinished(SwipeListAdapter swipeListAdapter, int position, AnimationType animationType) {
+        if (restartOnFinish) {
+            frontView.setTranslationX(0.0f);
+        }
+        else {
+            swipeListAdapter.setViewState(position, animationType);
+        }
+    }
+
+    public List<ObjectAnimator> createSwipeAnimation(final int motionPosition, final AnimationType animationType) {
         List<ObjectAnimator> objectAnimators = new ArrayList<ObjectAnimator>();
         float finalLocation = 0.0f;
         switch (animationType) {
@@ -96,6 +122,11 @@ public class ItemSwipeListView extends FrameLayout {
                 break;
             case LEFT:
                 finalLocation = -frontView.getWidth() + swipeLeftMargin;
+                if (swipeRightView != null) {
+                    ObjectAnimator rightViewAnimator = ObjectAnimator.ofFloat(swipeRightView, "x", finalLocation);
+                    rightViewAnimator.setDuration(animationDuration);
+                    objectAnimators.add(rightViewAnimator);
+                }
                 break;
             case RIGHT:
                 finalLocation = frontView.getWidth() - swipeRightMargin;
@@ -103,6 +134,24 @@ public class ItemSwipeListView extends FrameLayout {
         }
         ObjectAnimator frontAnimator = ObjectAnimator.ofFloat(frontView, "x", finalLocation);
         frontAnimator.setDuration(animationDuration);
+        final SwipeListView swipeListView = (SwipeListView) getParent();
+        frontAnimator.addListener(new DefaultAnimatorListener() {
+
+            private boolean canceled = false;
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!canceled) {
+                    ((View) ((ObjectAnimator) animation).getTarget()).getParent();
+                    animationType.onAnimationEnd(swipeListView, motionPosition,
+                            ItemSwipeListView.this);
+                }
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                canceled = true;
+            }
+        });
         objectAnimators.add(frontAnimator);
         return objectAnimators;
     }
@@ -120,7 +169,10 @@ public class ItemSwipeListView extends FrameLayout {
                 finalLocation = -frontView.getWidth() + swipeLeftMargin;
                 break;
         }
-        frontView.setTranslationX(finalLocation);
+        if (restartOnFinish)
+            frontView.setTranslationX(0.0f);
+        else
+            frontView.setTranslationX(finalLocation);
     }
 
     public boolean isFrontViewContains(int x, int y) {
