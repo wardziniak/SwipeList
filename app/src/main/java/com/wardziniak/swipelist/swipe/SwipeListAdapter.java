@@ -47,35 +47,20 @@ public class SwipeListAdapter extends BaseAdapter {
         return adapter.getItemId(position);
     }
 
-    private void resetView(ItemSwipeListView itemSwipeListView) {
-        View frontView = itemSwipeListView.findViewById(R.id.frontView);
-        frontView.setTranslationX(0);
-    }
-
-    private void prapreView(ItemSwipeListView itemSwipeListView, AnimationType animationType) {
-        View frontView = itemSwipeListView.findViewById(R.id.frontView);
-        switch (animationType) {
-            case FRONT:
-                frontView.setTranslationX(0);
-                break;
-            default:
-                frontView.setTranslationX(frontView.getWidth());
-        }
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = adapter.getView(position, convertView, parent);
-        if (viewsStates.size() <= position) {
-            viewsStates.add(AnimationType.FRONT);
-        }
         if (!(view instanceof ItemSwipeListView)) {
             throw new IllegalArgumentException("Incorrect type of View inflate by adapter. Is " + view.getClass() + " instead of ItemSwipeListView.");
         }
-        swipeList.cancelItemSwipeListViewAnimations((ItemSwipeListView) view);
-        swipeList.setItemSwipeListViewAttributes((ItemSwipeListView) view);
-        ((ItemSwipeListView) view).prapreView(viewsStates.get(position));
-        //prapreView((ItemSwipeListView) view, viewsStates.get(position));
+        if (viewsStates.size() <= position) {
+            viewsStates.add(AnimationType.FRONT);
+        }
+        ItemSwipeListView itemSwipeListView = (ItemSwipeListView) view;
+        itemSwipeListView.checkView();
+        swipeList.cancelItemSwipeListViewAnimations(itemSwipeListView);
+        swipeList.setItemSwipeListViewAttributes(itemSwipeListView);
+        itemSwipeListView.prapreView(viewsStates.get(position));
         return view;
     }
 

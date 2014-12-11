@@ -21,5 +21,7 @@
         </attr>
         <attr name="SwipeListViewItemLeftMargin" format="dimension"/>
         <attr name="SwipeListViewItemRightMargin" format="dimension"/>
+        <attr name="SwipeListViewMinVelocityToSwipe" format="float" />
+        <attr name="SwipeListViewAnimationDuration" format="integer" />
     </declare-styleable>
 </resources>

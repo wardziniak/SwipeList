@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.wardziniak.swipelist.R;
 import com.wardziniak.swipelist.AbsSwipeLayout;
 import com.wardziniak.swipelist.SwipeableView;
+import com.wardziniak.swipelist.swipe.ItemSwipeListView;
 import com.wardziniak.swipelist.swipe.SampleAdapter;
 import com.wardziniak.swipelist.swipe.SwipeListAdapter;
 import com.wardziniak.swipelist.swipe.SwipeListView;
@@ -90,13 +91,13 @@ public class MainActivity extends Activity implements SwipeListView.OnItemSwipeL
     }
 
     @Override
-    public void onLeftSwipe(SwipeListView swipeListView, int position, long id) {
+    public void onLeftSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id) {
         Log.d("DUPA", "onLeftSwipe:" + position);
         Toast.makeText(this, "onLeftSwipe:" + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void onRightSwipe(SwipeListView swipeListView, int position, long id) {
+    public void onRightSwipe(SwipeListView swipeListView, ItemSwipeListView itemSwipeListView, int position, long id) {
         Log.d("DUPA", "onRightSwipe:" + position);
         Toast.makeText(this, "onRightSwipe:" + position, Toast.LENGTH_SHORT).show();
     }

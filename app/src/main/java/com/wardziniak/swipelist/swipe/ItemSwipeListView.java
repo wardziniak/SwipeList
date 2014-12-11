@@ -19,16 +19,20 @@ import java.util.List;
  */
 public class ItemSwipeListView extends FrameLayout {
 
+    private static String TAG = "SwipeList:ItemSwipeListView";
+
     private View frontView;
     private View swipeRightView;
     private View swipeLeftView;
 
-    private long animationDuration = 1000;
-    private float swipeLeftMargin = 100.0f;
-    private float swipeRightMargin = 100.0f;
+    private long animationDuration;
+    private float swipeLeftMargin;
+    private float swipeRightMargin;
     private boolean isLeftSwipeable;
     private boolean isRightSwipeable;
     private boolean restartOnFinish;
+
+    private boolean reseted = true;
 
 
     public ItemSwipeListView(Context context) {
@@ -75,11 +79,27 @@ public class ItemSwipeListView extends FrameLayout {
         this.restartOnFinish = restartOnFinish;
     }
 
+    void setAnimationDuration(long animationDuration) {
+        this.animationDuration = animationDuration;
+    }
+
+    public boolean isReseted() {
+        return reseted;
+    }
+
     public void checkView() {
         if (isLeftSwipeable && swipeLeftView == null)
             throw new IllegalArgumentException("ItemSwipeListView doesn't have child with swipeLeftView id");
         if (isRightSwipeable && swipeRightView == null)
             throw new IllegalArgumentException("ItemSwipeListView doesn't have child with swipeRightView id");
+        if (frontView == null)
+            throw new IllegalArgumentException("ItemSwipeListView doesn't have child with frontView id");
+    }
+
+    private void setComponentsLocation(float newLocation) {
+        frontView.setTranslationX(newLocation);
+        if (swipeRightView != null)
+            swipeRightView.setTranslationX(newLocation < 0 ? newLocation : 0.0f);
     }
 
     public void moveView(float x) {
@@ -92,12 +112,8 @@ public class ItemSwipeListView extends FrameLayout {
         }
         else
             newLocation = 0.0f;
-        frontView.setTranslationX(newLocation);
-        //if (newLocation <= 0) {
-            if (swipeRightView != null)
-                swipeRightView.setTranslationX(newLocation < 0 ? newLocation : 0);
-        //}
-        Log.d("DUPA", "moveFrontView:");
+        setComponentsLocation(newLocation);
+        Log.d(TAG, "moveFrontView:");
     }
 
     public AnimationType getAnimationTypeAccordingToX() {
@@ -123,21 +139,19 @@ public class ItemSwipeListView extends FrameLayout {
             case LEFT:
                 finalLocation = -frontView.getWidth() + swipeLeftMargin;
                 if (swipeRightView != null) {
-                    ObjectAnimator rightViewAnimator = ObjectAnimator.ofFloat(swipeRightView, "x", finalLocation);
-                    rightViewAnimator.setDuration(animationDuration);
-                    objectAnimators.add(rightViewAnimator);
+                    objectAnimators.add(createViewObjectAnitmator(swipeRightView, finalLocation, animationDuration));
                 }
                 break;
             case RIGHT:
                 finalLocation = frontView.getWidth() - swipeRightMargin;
                 break;
         }
-        ObjectAnimator frontAnimator = ObjectAnimator.ofFloat(frontView, "x", finalLocation);
-        frontAnimator.setDuration(animationDuration);
+        ObjectAnimator frontViewAnimator = createViewObjectAnitmator(frontView, finalLocation, animationDuration);
         final SwipeListView swipeListView = (SwipeListView) getParent();
-        frontAnimator.addListener(new DefaultAnimatorListener() {
+        frontViewAnimator.addListener(new DefaultAnimatorListener() {
 
             private boolean canceled = false;
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (!canceled) {
@@ -152,7 +166,8 @@ public class ItemSwipeListView extends FrameLayout {
                 canceled = true;
             }
         });
-        objectAnimators.add(frontAnimator);
+
+        objectAnimators.add(frontViewAnimator);
         return objectAnimators;
     }
 
@@ -169,16 +184,17 @@ public class ItemSwipeListView extends FrameLayout {
                 finalLocation = -frontView.getWidth() + swipeLeftMargin;
                 break;
         }
-        if (restartOnFinish)
-            frontView.setTranslationX(0.0f);
-        else
-            frontView.setTranslationX(finalLocation);
+        if (restartOnFinish) {
+            finalLocation = 0.0f;
+        }
+        reseted = true;
+        setComponentsLocation(finalLocation);
     }
 
     public boolean isFrontViewContains(int x, int y) {
         int [] location = new int[2];
         frontView.getLocationOnScreen(location);
-        Log.d("DUPA", "isFrontViewContains:::" + x + ":" + y + "::" + location[0] + ":" + location[1] + ":" + (location[0] + frontView.getWidth())
+        Log.d(TAG, "isFrontViewContains:::" + x + ":" + y + "::" + location[0] + ":" + location[1] + ":" + (location[0] + frontView.getWidth())
             + ":" + (location[1] + frontView.getHeight()));
         Rect rect = new Rect(location[0], location[1], location[0] + frontView.getWidth(), location[1] + frontView.getHeight());
         return rect.contains(x, y);
@@ -190,6 +206,12 @@ public class ItemSwipeListView extends FrameLayout {
 
     public View getFrontView() {
         return frontView;
+    }
+
+    private static ObjectAnimator createViewObjectAnitmator(View view,  float x, long animationDuration) {
+        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "x", x);
+        objectAnimator.setDuration(animationDuration);
+        return  objectAnimator;
     }
 
 }
