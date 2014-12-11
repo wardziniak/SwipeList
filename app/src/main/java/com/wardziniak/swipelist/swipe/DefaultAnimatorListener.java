@@ -4,6 +4,7 @@ import android.animation.Animator;
 
 /**
  * Created by wardziniak on 12/10/14.
+ * Empty implementation of Animator.AnimatorListener.
  */
 public class DefaultAnimatorListener implements Animator.AnimatorListener {
     @Override

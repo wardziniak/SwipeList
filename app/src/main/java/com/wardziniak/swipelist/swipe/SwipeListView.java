@@ -30,7 +30,7 @@ public class SwipeListView extends ListView {
     private static final float DEFAULT_RIGHT_MARGIN = 0.0f;
     private static final boolean DEFAULT_RESTART_ON_FINISH = false;
 
-    public final static int TOUCH_STATE_REST = 0;
+    public final static int TOUCH_STATE_NONE_SCROLLING = 0;
     public final static int TOUCH_STATE_SCROLLING_X = 1;
     public final static int TOUCH_STATE_SCROLLING_Y = 2;
 
@@ -48,7 +48,7 @@ public class SwipeListView extends ListView {
     private float lastMotionX;
     private float lastMotionY;
 
-    private int touchState = TOUCH_STATE_REST;
+    private int touchState = SWIPEABLE_NONE;
 
     private SwipeListViewTouchListener swipeListViewTouchListener;
 
@@ -89,8 +89,8 @@ public class SwipeListView extends ListView {
     private void initAttrs(AttributeSet attributeSet) {
         if (attributeSet != null) {
             TypedArray styled = getContext().obtainStyledAttributes(attributeSet, R.styleable.SwipeListView);
-            this.restartOnFinish = styled.getBoolean(R.styleable.SwipeListView_SwipeListViewrItemRestartOnFinish, DEFAULT_RESTART_ON_FINISH);
-            final int swipeType = styled.getInt(R.styleable.SwipeListView_SwipeListViewsItemSwipeType, DEFAULT_SWIPE_TYPE);
+            this.restartOnFinish = styled.getBoolean(R.styleable.SwipeListView_SwipeListViewItemRestartOnFinish, DEFAULT_RESTART_ON_FINISH);
+            final int swipeType = styled.getInt(R.styleable.SwipeListView_SwipeListViewItemSwipeType, DEFAULT_SWIPE_TYPE);
             this.isLeftSwipable = (swipeType & SWIPEABLE_LEFT) != 0;
             this.isRightSwipable = (swipeType & SWIPEABLE_RIGHT) != 0;
             this.swipeLeftMargin = styled.getDimension(R.styleable.SwipeListView_SwipeListViewItemLeftMargin, DEFAULT_LEFT_MARGIN);
@@ -113,18 +113,21 @@ public class SwipeListView extends ListView {
     }
 
     void onLeftSwipe(int position, ItemSwipeListView itemSwipeListView) {
+        Log.d(TAG, "onLeftSwipe:" + position);
         if (onItemLeftSwipeListener != null)
             onItemLeftSwipeListener.onLeftSwipe(this, itemSwipeListView, position, swipeListAdapter.getItemId(position));
         itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.LEFT);
     }
 
     void onRightSwipe(int position, ItemSwipeListView itemSwipeListView) {
+        Log.d(TAG, "onRightSwipe:" + position);
         if (onItemRightSwipeListener != null)
             onItemRightSwipeListener.onRightSwipe(this, itemSwipeListView, position, swipeListAdapter.getItemId(position));
         itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.RIGHT);
     }
 
     void onFrontBack(int position, ItemSwipeListView itemSwipeListView) {
+        Log.d(TAG, "onFrontBack:" + position);
         itemSwipeListView.onAnimationFinished(swipeListAdapter, position, AnimationType.FRONT);
     }
 
@@ -153,7 +156,7 @@ public class SwipeListView extends ListView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         calculateMoveState(ev);
-        Log.d(TAG, "onInterceptTouchEvent:" +":" + ev.getAction() + ":" + touchState);
+        //Log.d(TAG, "onInterceptTouchEvent:" +":" + ev.getAction() + ":" + touchState);
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 /* ACTION_DOWN is passed directly to swipeListViewTouchListener.
@@ -182,21 +185,21 @@ public class SwipeListView extends ListView {
         final int y = (int) motionEvent.getY();
         final int xDiff = (int) Math.abs(x - lastMotionX);
         final int yDiff = (int) Math.abs(y - lastMotionY);
-        Log.d(TAG, "calculateMoveState:" + touchSlop + ":" + xDiff + ":" + yDiff + ":::" + x + ":" + lastMotionX + "::" + y + ":" + lastMotionY);
+        //Log.d(TAG, "calculateMoveState:" + touchSlop + ":" + xDiff + ":" + yDiff + ":::" + x + ":" + lastMotionX + "::" + y + ":" + lastMotionY);
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
         {
             lastMotionX = x;
             lastMotionY = y;
-            touchState = TOUCH_STATE_REST;
+            touchState = TOUCH_STATE_NONE_SCROLLING;
             return;
         }
 
         final boolean xMoved = xDiff > touchSlop;
         final boolean yMoved = yDiff > touchSlop;
         touchState = yMoved ? TOUCH_STATE_SCROLLING_Y : xMoved ? TOUCH_STATE_SCROLLING_X : touchState;
-        Log.d(TAG, "calculateMoveState::::" + touchState);
-        if (touchState != TOUCH_STATE_REST) {
+        //Log.d(TAG, "calculateMoveState::::" + touchState);
+        if (touchState != TOUCH_STATE_NONE_SCROLLING) {
             lastMotionX = x;
             lastMotionY = y;
         }

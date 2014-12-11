@@ -2,6 +2,7 @@ package com.wardziniak.swipelist.swipe;
 
 /**
  * Created by wardziniak on 12/9/14.
+ * AnimationType
  */
 public enum AnimationType {
     LEFT, FRONT, RIGHT;

@@ -50,7 +50,7 @@ public class MainActivity extends Activity implements SwipeListView.OnItemSwipeL
         //swipeListView.setAdapter(new SampleAdapter(this, android.R.layout.simple_list_item_1, itemArray));
         //swipeListView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, itemArray));
 
-        swipeListView.setAdapter(new SwipeListAdapter(this, new SampleAdapter(this, android.R.layout.simple_list_item_1, itemArray)));
+        swipeListView.setAdapter(new SwipeListAdapter(new SampleAdapter(this, android.R.layout.simple_list_item_1, itemArray)));
         swipeListView.setOnItemSwipeListener(this);
 
         absSwipeLayout = (SwipeableView) findViewById(R.id.swipeLayout);

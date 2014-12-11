@@ -13,18 +13,20 @@ import java.util.List;
 
 /**
  * Created by wardziniak on 12/7/14.
+ * Addaper wrapper class. It gets ArrayAdapter class in constructor.
+ * Calls of overridden method are passed to wrapped class
+ * SwipeListAdapter:getView(...) method calls wrapped adapter getView(...) method
+ *  and then check if proper view was returned and prepare ItemSwipeListView view
  */
 public class SwipeListAdapter extends BaseAdapter {
 
     private List<AnimationType> viewsStates;
     private ArrayAdapter adapter;
-    private Context context;
     private SwipeListView swipeList;
 
-    public SwipeListAdapter(Context context, ArrayAdapter adapter) {
+    public SwipeListAdapter(ArrayAdapter adapter) {
         super();
         this.adapter = adapter;
-        this.context = context;
         this.viewsStates = new ArrayList<AnimationType>();
     }
 

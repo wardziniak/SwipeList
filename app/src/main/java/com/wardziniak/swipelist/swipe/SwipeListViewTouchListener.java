@@ -7,16 +7,20 @@ import android.view.View;
 
 /**
  * Created by wardziniak on 12/6/14.
+ * SwipeListView View.OnTouchListener. Has to public method: onTouchDown(...) and onTouch(...)
+ * Method onTouch(...) ignores ACTION_DOWN events, because there wasn't possibility to recognize how it was called:
+ *      1. during scrolling
+ *      2. because child view doesn't handle MotionEvent
+ * When ACTION_DOWN event is fired SwipeListView through onInterceptTouchEvent(...) call onTouchDown(...)
+ * Method onTouch(...) might be invoked in two way:
+ * 1. MotionEvent event wasn't handle by subview
+ * 2. SwipeListView intercepts MotionEvent and redirect MotionEvent to its View.OnTouchListener (SwipeListViewTouchListener).
+ *  It happens, when SwipeListView::onInterceptTouchEvent(...) return true. Not all MotionEvent should be handle by SwipeListViewTouchListener::onTouch(...)
+ *  If it TOUCH_STATE_SCROLLING_Y it should be redirected to SwipeListView super class, that implements vertical scrolling
  */
 public class SwipeListViewTouchListener implements View.OnTouchListener {
 
     private static final String TAG = "SwipeList:SwipeListViewTouchListener";
-
-    private final static int TOUCH_STATE_NONE = 0;
-    private final static int TOUCH_STATE_SCROLLING_X = 1;
-    private final static int TOUCH_STATE_SCROLLING_Y = 2;
-
-    private final static float MIN_VELOCITY_TO_SWIPE = 100.0f;
 
     private SwipeListView swipeListView;
 
@@ -42,8 +46,8 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
     public boolean onTouchDown(MotionEvent motionEvent) {
         motionX = (int) motionEvent.getRawX();
         motionY = (int) motionEvent.getRawY();
-        Log.d(TAG, "SwipeListViewTouchListener:onTouchDown:" + motionX + ":" + motionY);
-        touchState = TOUCH_STATE_NONE;
+        Log.d(TAG, "onTouchDown x:" + motionX + ":y:" + motionY);
+        touchState = SwipeListView.TOUCH_STATE_NONE_SCROLLING;
         recycleVelocityTracker();
         initVelocityTrackerIfNotExists();
         velocityTracker.addMovement(motionEvent);
@@ -52,7 +56,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         if (isOnFrontView && containsViewAnimation(swipeView)) {
             // If touch view was animated than we cancel animation and set that we in X scrolling mode
             cancelAllItemAnimations(swipeView);
-            touchState = TOUCH_STATE_SCROLLING_X;
+            touchState = SwipeListView.TOUCH_STATE_SCROLLING_X;
             return true;
         }
         return false;
@@ -64,7 +68,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
         // Use raw data, because when we check if event was dispatched to frontView, we need to compare to getLocationOnScreen
         final int x = (int) motionEvent.getRawX();
         final int y = (int) motionEvent.getRawY();
-        Log.d(TAG, "SwipeListViewTouchListener:onTouch:" + motionEvent.getAction() + ":" + touchState + "::::" + x + ":" + y);
         // Check touch action and decide, what to do
         switch (motionEvent.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -74,16 +77,16 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                  */
                 return false;
             case MotionEvent.ACTION_MOVE:
-                if (getMotion(motionEvent) != TOUCH_STATE_SCROLLING_X || !isOnFrontView)
+                if (getMotion(motionEvent) != SwipeListView.TOUCH_STATE_SCROLLING_X || !isOnFrontView)
                     return false;
                 velocityTracker.addMovement(motionEvent);
                 velocityTracker.computeCurrentVelocity(1000);
                 swipeView.moveView(x - motionX);
-                motionX = x;//(int) motionEvent.getX();
-                motionY = y;//(int) motionEvent.getY();
+                motionX = x;
+                motionY = y;
                 return true;
             case MotionEvent.ACTION_UP:
-                if (getMotion(motionEvent) != TOUCH_STATE_SCROLLING_X || !isOnFrontView)
+                if (getMotion(motionEvent) != SwipeListView.TOUCH_STATE_SCROLLING_X || !isOnFrontView)
                     return false;
                 velocityTracker.addMovement(motionEvent);
                 velocityTracker.computeCurrentVelocity(1000);
@@ -98,7 +101,6 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
     }
 
     private void checkMotionEventLocation(MotionEvent motionEvent) {
-        Log.d(TAG, "checkMotionEventLocation::" + motionX + ":" + motionY);
         motionPosition = swipeListView.pointToPosition((int) motionEvent.getX(), (int) motionEvent.getY());
         swipeView = (ItemSwipeListView) swipeListView.getChildAt(motionPosition - swipeListView.getFirstVisiblePosition());
         isOnFrontView = false;
@@ -106,14 +108,13 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
             isOnFrontView = swipeView.isFrontViewContains(motionX, motionY);
     }
 
-    public int getMotion(MotionEvent motionEvent) {
+    private int getMotion(MotionEvent motionEvent) {
         // We do not change touch type;
-        Log.d(TAG, "getMotion:" + touchState);
-        if (touchState != TOUCH_STATE_NONE)
+        if (touchState != SwipeListView.TOUCH_STATE_NONE_SCROLLING)
             return touchState;
         int diffX = (int) Math.abs(motionEvent.getRawX() - motionX);
         int diffY = (int) Math.abs(motionEvent.getRawY() - motionY);
-        touchState = diffY > touchSlop ? TOUCH_STATE_SCROLLING_Y : diffX > touchSlop ? TOUCH_STATE_SCROLLING_X : touchState;
+        touchState = diffY > touchSlop ? SwipeListView.TOUCH_STATE_SCROLLING_Y : diffX > touchSlop ? SwipeListView.TOUCH_STATE_SCROLLING_X : touchState;
         return touchState;
     }
 
@@ -126,10 +127,10 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
     }
 
     private void makeSwipe(float velocityX) {
-        Log.d(TAG, "makeSwipe:" + velocityX + ":::" + swipeView.getX() + ":" + swipeView.getFrontViewX());
         AnimationType animationType;
         animationType = Math.abs(velocityX) < minVelocityToSwipe || Math.signum(velocityX) != Math.signum(swipeView.getFrontViewX()) ?
                 AnimationType.FRONT : swipeView.getAnimationTypeAccordingToX();
+        Log.d(TAG, "Animation:" + animationType + " velocityX: + " + velocityX);
         swipeListView.startItemSwipeListViewAnimations(swipeView, animationType, motionPosition);
     }
 

@@ -12,8 +12,8 @@
         <attr name="swipeRightMargin" format="dimension"/>
     </declare-styleable>
     <declare-styleable name="SwipeListView">
-        <attr name="SwipeListViewrItemRestartOnFinish" format="boolean" />
-        <attr name="SwipeListViewsItemSwipeType" format="enum" >
+        <attr name="SwipeListViewItemRestartOnFinish" format="boolean" />
+        <attr name="SwipeListViewItemSwipeType" format="enum" >
             <enum name="left" value="1"/>
             <enum name="right" value="2"/>
             <enum name="both" value="3"/>

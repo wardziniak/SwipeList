@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Created by wardziniak on 12/8/14.
+ * SwipeListAnimatorSet manage all existing animation. Used to cancel and start them
  */
 public class SwipeListAnimatorSet extends DefaultAnimatorListener {
 
@@ -21,12 +22,6 @@ public class SwipeListAnimatorSet extends DefaultAnimatorListener {
         listOfAnimations = new ArrayList<ObjectAnimator>();
         this.swipeListView = swipeListView;
     }
-
-/*    public void startAnimation(ObjectAnimator objectAnimator, int position, AnimationType animationType) {
-        List<ObjectAnimator> animators = new ArrayList<ObjectAnimator>();
-        animators.add(objectAnimator);
-        startAnimations(animators, position, animationType);
-    }*/
 
     public void startAnimations(List<ObjectAnimator> objectAnimators, final int position, final AnimationType animationType) {
         listOfAnimations.addAll(objectAnimators);
