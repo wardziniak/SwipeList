@@ -7,9 +7,13 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 
 import com.wardziniak.swipelist.R;
+import com.wardziniak.swipelist.swipe.animation.AplhaAnimationSwipeableView;
+import com.wardziniak.swipelist.swipe.animation.SwipeableViewAnimation;
+import com.wardziniak.swipelist.swipe.animation.TranslateAnimationSwipeableView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,8 @@ public class ItemSwipeListView extends FrameLayout {
     private boolean restartOnFinish;
 
     private boolean reseted = true;
+
+    private SwipeableViewAnimation animation = new AplhaAnimationSwipeableView();
 
 
     public ItemSwipeListView(Context context) {
@@ -96,10 +102,61 @@ public class ItemSwipeListView extends FrameLayout {
             throw new IllegalArgumentException("ItemSwipeListView doesn't have child with frontView id");
     }
 
+    public float getCurrentAlpha() {
+        return frontView.getAlpha();
+    }
+
+    public float getCurrentTranslationX() {
+        return frontView.getTranslationX();
+    }
+
+    public void startMonitoring(float motionX) {
+        animation.onStartMonitoring(this, motionX);
+    }
+
+    public void onSwipeView(float x) {
+        float fraction = getFractionOfSwipe(x);
+        animation.move(this, fraction);
+    }
+
+    public void changeTranslation(float currentTranslation) {
+        //Log.d("DUPA", "changeTranslation:" + fraction + ":::" + frontView.getX());
+        //float newLocation = frontView.getX() + frontView.getWidth() * fraction;
+        if (currentTranslation >= 0 && isRightSwipeable) {
+            currentTranslation = currentTranslation > frontView.getWidth() ? frontView.getWidth()  : currentTranslation;
+        }
+        else if (currentTranslation < 0 && isLeftSwipeable) {
+            currentTranslation = currentTranslation < -frontView.getWidth() ? -frontView.getWidth() : currentTranslation;
+        }
+        else
+            currentTranslation = 0.0f;
+        setComponentsLocation(currentTranslation);
+    }
+
+    public void setSwipeAlpha(float newAlpha) {
+        //float newAlpha = frontView.getAlpha() + farction;
+        newAlpha -= 1;
+        Log.d("DUPA", "setSwipeAlpha:" + newAlpha);
+        if (newAlpha >= 0 && isRightSwipeable) {
+            newAlpha = Math.min(newAlpha, 1.0f);
+        }
+        else if (newAlpha < 0 && isLeftSwipeable) {
+            newAlpha = Math.min(-1*newAlpha, 1.0f);
+        }
+        else
+            newAlpha = 0.0f;
+        frontView.setAlpha(newAlpha);
+    }
+
+
     private void setComponentsLocation(float newLocation) {
         frontView.setTranslationX(newLocation);
         if (swipeRightView != null)
             swipeRightView.setTranslationX(newLocation < 0 ? newLocation : 0.0f);
+    }
+
+    public float getFractionOfSwipe(float x) {
+        return (x/frontView.getWidth());
     }
 
     public void moveView(float x) {

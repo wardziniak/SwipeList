@@ -6,21 +6,21 @@
     <string name="action_settings">Settings</string>
 
     <string-array name="items_str">
-       <item>Pierwszy element</item>
-       <item>Drugi element</item>
-       <item>Trzeci element</item>
-       <item>Czwarty element</item>
-       <item>5 element</item>
-       <item>6 element</item>
-       <item>7 element</item>
-       <item>8 element</item>
-       <item>9 element</item>
-       <item>10 element</item>
-       <item>11 element</item>
-       <item>12 element</item>
-       <item>13 element</item>
-       <item>14 element</item>
-       <item>15 element</item>
+        <item>Pierwszy element</item>
+        <item>Drugi element</item>
+        <item>Trzeci element</item>
+        <item>Czwarty element</item>
+        <item>5 element</item>
+        <item>6 element</item>
+        <item>7 element</item>
+        <item>8 element</item>
+        <item>9 element</item>
+        <item>10 element</item>
+        <item>11 element</item>
+        <item>12 element</item>
+        <item>13 element</item>
+        <item>14 element</item>
+        <item>15 element</item>
     </string-array>
     <string-array name="list_items">
         <item>1 element</item>
@@ -84,4 +84,7 @@
         <item>59 element</item>
         <item>60 element</item>
     </string-array>
+
+    <string name="title_activity_test">TestActivity</string>
+
 </resources>

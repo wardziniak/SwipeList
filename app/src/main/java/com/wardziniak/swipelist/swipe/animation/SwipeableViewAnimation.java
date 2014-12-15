@@ -12,10 +12,16 @@ import java.util.List;
  */
 public abstract class SwipeableViewAnimation {
 
-    public abstract void move(ItemSwipeListView itemSwipeListView, float x);
+    private float motionXStart;
+
+    public abstract void move(ItemSwipeListView itemSwipeListView, float fraction);
+
+    public void onStartMonitoring(ItemSwipeListView itemSwipeListView, float motionX) {
+        this.motionXStart = motionX;
+    }
 
     public abstract List<ObjectAnimator> createSwipeAnimation(ItemSwipeListView itemSwipeListView, final float x, final int motionPosition,
                 final AnimationType animationType);
 
-    public abstract float getNewViewPosition(ItemSwipeListView itemSwipeListView, float x);
+    public abstract float getFractionOfNewPosition(ItemSwipeListView itemSwipeListView, float currentPosition, float change);
 }
