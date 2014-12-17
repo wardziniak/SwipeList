@@ -7,13 +7,11 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.widget.FrameLayout;
 
 import com.wardziniak.swipelist.R;
 import com.wardziniak.swipelist.swipe.animation.AplhaAnimationSwipeableView;
 import com.wardziniak.swipelist.swipe.animation.SwipeableViewAnimation;
-import com.wardziniak.swipelist.swipe.animation.TranslateAnimationSwipeableView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +36,7 @@ public class ItemSwipeListView extends FrameLayout {
 
     private boolean reseted = true;
 
-    private SwipeableViewAnimation animation = new AplhaAnimationSwipeableView();
+    private SwipeableViewAnimation swipeableViewAnimation = new AplhaAnimationSwipeableView(this);
 
 
     public ItemSwipeListView(Context context) {
@@ -111,12 +109,20 @@ public class ItemSwipeListView extends FrameLayout {
     }
 
     public void startMonitoring(float motionX) {
-        animation.onStartMonitoring(this, motionX);
+        swipeableViewAnimation.onStartMonitoring(this, motionX);
     }
 
-    public void onSwipeView(float x) {
+    public void restartMonitoring(float motionX) {
+        swipeableViewAnimation.onReStartMonitoring(this, motionX);
+    }
+
+    public void swipeView(float x) {
         float fraction = getFractionOfSwipe(x);
-        animation.move(this, fraction);
+        swipeableViewAnimation.move(this, fraction);
+    }
+
+    public void startViewAnimation(int motionPosition, float velocityX) {
+        //swipeableViewAnimation.
     }
 
     public void changeTranslation(float currentTranslation) {
@@ -135,13 +141,13 @@ public class ItemSwipeListView extends FrameLayout {
 
     public void setSwipeAlpha(float newAlpha) {
         //float newAlpha = frontView.getAlpha() + farction;
-        newAlpha -= 1;
+        //newAlpha -= 1;
         Log.d("DUPA", "setSwipeAlpha:" + newAlpha);
         if (newAlpha >= 0 && isRightSwipeable) {
-            newAlpha = Math.min(newAlpha, 1.0f);
+            newAlpha = Math.min(1-Math.abs(newAlpha), 1.0f);
         }
         else if (newAlpha < 0 && isLeftSwipeable) {
-            newAlpha = Math.min(-1*newAlpha, 1.0f);
+            newAlpha = Math.min(1-Math.abs(newAlpha), 1.0f);
         }
         else
             newAlpha = 0.0f;
@@ -195,9 +201,9 @@ public class ItemSwipeListView extends FrameLayout {
                 break;
             case LEFT:
                 finalLocation = -frontView.getWidth() + swipeLeftMargin;
-                if (swipeRightView != null) {
-                    objectAnimators.add(createViewObjectAnitmator(swipeRightView, finalLocation, animationDuration));
-                }
+//                if (swipeRightView != null) {
+//                    objectAnimators.add(createViewObjectAnitmator(swipeRightView, finalLocation, animationDuration));
+//                }
                 break;
             case RIGHT:
                 finalLocation = frontView.getWidth() - swipeRightMargin;
@@ -215,6 +221,7 @@ public class ItemSwipeListView extends FrameLayout {
                     ((View) ((ObjectAnimator) animation).getTarget()).getParent();
                     animationType.onAnimationEnd(swipeListView, motionPosition,
                             ItemSwipeListView.this);
+                    //ItemSwipeListView.this.swipeableViewAnimation.onAnimationFinished();
                 }
             }
 

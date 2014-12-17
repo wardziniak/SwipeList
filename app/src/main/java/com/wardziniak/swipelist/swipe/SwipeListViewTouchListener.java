@@ -57,7 +57,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
             // If touch view was animated than we cancel animation and set that we in X scrolling mode
             cancelAllItemAnimations(swipeView);
             touchState = SwipeListView.TOUCH_STATE_SCROLLING_X;
-            swipeView.startMonitoring(motionX);
+            swipeView.restartMonitoring(motionX);
             return true;
         }
         return false;
@@ -83,7 +83,7 @@ public class SwipeListViewTouchListener implements View.OnTouchListener {
                 velocityTracker.addMovement(motionEvent);
                 velocityTracker.computeCurrentVelocity(1000);
                 //swipeView.moveView(x - motionX);
-                swipeView.onSwipeView(x - motionX);
+                swipeView.swipeView(x - motionX);
                 motionX = x;
                 motionY = y;
                 return true;

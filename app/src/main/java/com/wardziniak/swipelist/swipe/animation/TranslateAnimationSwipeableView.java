@@ -14,6 +14,10 @@ public class TranslateAnimationSwipeableView extends SwipeableViewAnimation {
 
     private float currentTranslation = 0.0f;
 
+    public TranslateAnimationSwipeableView(ItemSwipeListView itemSwipeListView) {
+        super(itemSwipeListView);
+    }
+
     @Override
     public void onStartMonitoring(ItemSwipeListView itemSwipeListView, float motionX) {
         currentTranslation = itemSwipeListView.getCurrentTranslationX();
@@ -23,7 +27,10 @@ public class TranslateAnimationSwipeableView extends SwipeableViewAnimation {
     @Override
     public void move(ItemSwipeListView itemSwipeListView, float fraction) {
         currentTranslation += fraction * itemSwipeListView.getWidth();
-        itemSwipeListView.changeTranslation(currentTranslation);
+        if (isMovePosibile())
+            itemSwipeListView.changeTranslation(currentTranslation);
+        else
+            currentTranslation -= fraction * itemSwipeListView.getWidth();
     }
 
     @Override
@@ -34,5 +41,15 @@ public class TranslateAnimationSwipeableView extends SwipeableViewAnimation {
     @Override
     public float getFractionOfNewPosition(ItemSwipeListView itemSwipeListView, float currentPosition, float change) {
         return 0;
+    }
+
+    @Override
+    public SwipeType getSwipeType() {
+        return currentTranslation > 0 ? SwipeType.RIGHT : currentTranslation < 0 ? SwipeType.LEFT : SwipeType.NONE;
+    }
+
+    @Override
+    public boolean isOutOfScope() {
+        return Math.abs(currentTranslation) > itemSwipeListView.getWidth();
     }
 }
